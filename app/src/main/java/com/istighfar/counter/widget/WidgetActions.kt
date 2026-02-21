@@ -19,27 +19,38 @@ class IncrementAction : ActionCallback {
         glanceId: GlanceId,
         parameters: ActionParameters
     ) {
+        // 1. تقديم اهتزاز فوري للمستخدم ليشعر بالاستجابة
+        hapticFeedback(context)
+
+        // 2. تحديث البيانات في الخلفية
         withContext(Dispatchers.IO) {
             CounterRepository(context).incrementCount()
         }
-        hapticFeedback(context)
+
+        // 3. تحديث واجهة الـ Widget
         IstighfarWidget().updateAll(context)
     }
 
     private fun hapticFeedback(context: Context) {
         try {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            val vibrator = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
                 val vibratorManager =
                     context.getSystemService(Context.VIBRATOR_MANAGER_SERVICE) as VibratorManager
-                val vibrator = vibratorManager.defaultVibrator
-                vibrator.vibrate(VibrationEffect.createOneShot(30, VibrationEffect.DEFAULT_AMPLITUDE))
+                vibratorManager.defaultVibrator
             } else {
                 @Suppress("DEPRECATION")
-                val vibrator = context.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
-                vibrator.vibrate(VibrationEffect.createOneShot(30, VibrationEffect.DEFAULT_AMPLITUDE))
+                context.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
+            }
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                // استخدام تأثير الضغطة الخفيفة العصرية
+                vibrator.vibrate(VibrationEffect.createPredefined(VibrationEffect.EFFECT_CLICK))
+            } else {
+                @Suppress("DEPRECATION")
+                vibrator.vibrate(30)
             }
         } catch (_: Exception) {
-            // Vibration not available
+            // الاهتزاز غير مدعوم أو غير مسموح
         }
     }
 }

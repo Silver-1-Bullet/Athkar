@@ -1,7 +1,7 @@
 package com.istighfar.counter.widget
 
+import android.content.Context
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.glance.GlanceId
@@ -17,33 +17,33 @@ import androidx.glance.layout.Alignment
 import androidx.glance.layout.Box
 import androidx.glance.layout.Column
 import androidx.glance.layout.Row
-import androidx.glance.layout.Spacer
 import androidx.glance.layout.fillMaxSize
 import androidx.glance.layout.fillMaxWidth
 import androidx.glance.layout.padding
-import androidx.glance.layout.size
-import androidx.glance.layout.wrapContentHeight
 import androidx.glance.text.FontWeight
 import androidx.glance.text.Text
 import androidx.glance.text.TextAlign
 import androidx.glance.text.TextStyle
-import androidx.glance.unit.ColorProvider
 import com.istighfar.counter.data.CounterRepository
 
 class IstighfarWidget : GlanceAppWidget() {
 
-    override val sizeMode = SizeMode.Exact
+    override val sizeMode = SizeMode.Single
 
-    override suspend fun provideGlance(context: android.content.Context, id: GlanceId) {
+    override suspend fun provideGlance(context: Context, id: GlanceId) {
         val repo = CounterRepository(context)
-        val (todayCount, lifetimeCount, dhikr) = repo.getSnapshot()
+        
+        // جلب البيانات قبل الدخول في سياق الـ Composable
+        val snapshot = repo.getSnapshot()
 
         provideContent {
-            WidgetContent(
-                dhikr = dhikr,
-                todayCount = todayCount,
-                lifetimeCount = lifetimeCount
-            )
+            GlanceTheme {
+                WidgetContent(
+                    dhikr = snapshot.third,
+                    todayCount = snapshot.first,
+                    lifetimeCount = snapshot.second
+                )
+            }
         }
     }
 
@@ -53,89 +53,72 @@ class IstighfarWidget : GlanceAppWidget() {
         todayCount: Int,
         lifetimeCount: Int
     ) {
-        val tealDark = ColorProvider(Color(0xFF0D4D4D))
-        val cream = ColorProvider(Color(0xFFF5F0E8))
-        val gold = ColorProvider(Color(0xFFD4A843))
-        val semiWhite = ColorProvider(Color(0x33FFFFFF))
-
         Box(
             modifier = GlanceModifier
                 .fillMaxSize()
-                .background(tealDark)
-                .clickable(actionRunCallback<IncrementAction>()),
+                .background(GlanceTheme.colors.surfaceVariant)
+                .clickable(actionRunCallback<IncrementAction>())
+                .padding(12.dp),
             contentAlignment = Alignment.Center
         ) {
             Column(
-                modifier = GlanceModifier
-                    .fillMaxSize()
-                    .padding(16.dp),
+                modifier = GlanceModifier.fillMaxSize(),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                // Dhikr text
                 Text(
                     text = dhikr,
                     style = TextStyle(
-                        color = cream,
-                        fontSize = 22.sp,
-                        fontWeight = FontWeight.Bold,
+                        color = GlanceTheme.colors.onSurfaceVariant,
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.Medium,
                         textAlign = TextAlign.Center
                     ),
                     modifier = GlanceModifier.fillMaxWidth()
                 )
 
-                Spacer(modifier = GlanceModifier.size(8.dp))
-
-                // Counter box
-                Box(
-                    modifier = GlanceModifier
-                        .background(semiWhite)
-                        .padding(horizontal = 24.dp, vertical = 8.dp),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text(
-                        text = todayCount.toString(),
-                        style = TextStyle(
-                            color = gold,
-                            fontSize = 36.sp,
-                            fontWeight = FontWeight.Bold,
-                            textAlign = TextAlign.Center
-                        )
+                Text(
+                    text = todayCount.toString(),
+                    style = TextStyle(
+                        color = GlanceTheme.colors.primary,
+                        fontSize = 48.sp,
+                        fontWeight = FontWeight.Bold,
+                        textAlign = TextAlign.Center
                     )
-                }
+                )
 
-                Spacer(modifier = GlanceModifier.size(8.dp))
-
-                // Bottom row: lifetime count + reset button
                 Row(
-                    modifier = GlanceModifier.fillMaxWidth(),
-                    horizontalAlignment = Alignment.CenterHorizontally,
+                    modifier = GlanceModifier.fillMaxWidth().padding(top = 8.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text(
-                        text = "الكل: $lifetimeCount",
-                        style = TextStyle(
-                            color = cream,
-                            fontSize = 12.sp,
-                            textAlign = TextAlign.Start
-                        ),
-                        modifier = GlanceModifier.wrapContentHeight()
-                    )
-
-                    Spacer(modifier = GlanceModifier.defaultWeight())
-
-                    Text(
-                        text = "↺",
-                        style = TextStyle(
-                            color = gold,
-                            fontSize = 20.sp,
-                            fontWeight = FontWeight.Bold
-                        ),
-                        modifier = GlanceModifier
-                            .clickable(actionRunCallback<ResetTodayAction>())
-                            .padding(8.dp)
-                    )
+                    Box(modifier = GlanceModifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+                        Text(
+                            text = "الإجمالي: $lifetimeCount",
+                            style = TextStyle(
+                                color = GlanceTheme.colors.onSurfaceVariant,
+                                fontSize = 12.sp
+                            )
+                        )
+                    }
                 }
+            }
+            
+            // زر إعادة التعيين
+            Box(
+                modifier = GlanceModifier.fillMaxSize(),
+                contentAlignment = Alignment.BottomEnd
+            ) {
+                Text(
+                    text = "↺",
+                    style = TextStyle(
+                        color = GlanceTheme.colors.secondary,
+                        fontSize = 24.sp,
+                        fontWeight = FontWeight.Bold
+                    ),
+                    modifier = GlanceModifier
+                        .clickable(actionRunCallback<ResetTodayAction>())
+                        .padding(8.dp)
+                )
             }
         }
     }

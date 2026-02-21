@@ -8,7 +8,7 @@ import android.os.VibratorManager
 import androidx.glance.GlanceId
 import androidx.glance.action.ActionParameters
 import androidx.glance.appwidget.action.ActionCallback
-import androidx.glance.appwidget.updateAll
+import androidx.glance.appwidget.state.updateAppWidgetState
 import com.istighfar.counter.data.CounterRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -27,8 +27,18 @@ class IncrementAction : ActionCallback {
             CounterRepository(context).incrementCount()
         }
 
-        // 3. تحديث واجهة الـ Widget
-        IstighfarWidget().updateAll(context)
+        // 3. تحديث حالة الـ Widget مباشرة
+        val snapshot = CounterRepository(context).getSnapshot()
+        updateAppWidgetState(context, glanceId) { prefs ->
+            prefs.toMutablePreferences().apply {
+                this[IstighfarWidget.todayCountKey] = snapshot.first
+                this[IstighfarWidget.lifetimeCountKey] = snapshot.second
+                this[IstighfarWidget.dhikrKey] = snapshot.third
+            }
+        }
+
+        // 4. تحديث واجهة الـ Widget
+        IstighfarWidget().update(context, glanceId)
     }
 
     private fun hapticFeedback(context: Context) {
@@ -64,6 +74,17 @@ class ResetTodayAction : ActionCallback {
         withContext(Dispatchers.IO) {
             CounterRepository(context).resetTodayCount()
         }
-        IstighfarWidget().updateAll(context)
+
+        // تحديث حالة الـ Widget مباشرة
+        val snapshot = CounterRepository(context).getSnapshot()
+        updateAppWidgetState(context, glanceId) { prefs ->
+            prefs.toMutablePreferences().apply {
+                this[IstighfarWidget.todayCountKey] = snapshot.first
+                this[IstighfarWidget.lifetimeCountKey] = snapshot.second
+                this[IstighfarWidget.dhikrKey] = snapshot.third
+            }
+        }
+
+        IstighfarWidget().update(context, glanceId)
     }
 }

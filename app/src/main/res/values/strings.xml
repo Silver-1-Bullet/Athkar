@@ -8,4 +8,9 @@
     <string name="lifetime">الإجمالي</string>
     <string name="settings">الإعدادات</string>
     <string name="auto_reset">إعادة التعيين التلقائي</string>
+    <string name="subtitle">سبّح واستغفر</string>
+    <string name="choose_dhikr">اختر الذكر</string>
+    <string name="auto_reset_midnight">إعادة التعيين التلقائي عند منتصف الليل</string>
+    <string name="reset_today">إعادة تعيين اليوم</string>
+    <string name="lifetime_total">الإجمالي: %d</string>
 </resources>

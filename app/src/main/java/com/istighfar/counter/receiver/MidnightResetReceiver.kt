@@ -5,6 +5,8 @@ import android.app.PendingIntent
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import android.os.Build
+import android.util.Log
 import androidx.glance.appwidget.updateAll
 import com.istighfar.counter.data.CounterRepository
 import com.istighfar.counter.widget.IstighfarWidget
@@ -33,6 +35,7 @@ class MidnightResetReceiver : BroadcastReceiver() {
     }
 
     companion object {
+        private const val TAG = "MidnightResetReceiver"
         private const val REQUEST_CODE = 1001
 
         fun scheduleMidnightAlarm(context: Context) {
@@ -49,13 +52,27 @@ class MidnightResetReceiver : BroadcastReceiver() {
                 .atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli()
 
             try {
-                alarmManager.setExactAndAllowWhileIdle(
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && !alarmManager.canScheduleExactAlarms()) {
+                    alarmManager.setAndAllowWhileIdle(
+                        AlarmManager.RTC_WAKEUP,
+                        triggerMillis,
+                        pendingIntent
+                    )
+                    Log.w(TAG, "Exact alarm permission not granted, using inexact alarm as fallback")
+                } else {
+                    alarmManager.setExactAndAllowWhileIdle(
+                        AlarmManager.RTC_WAKEUP,
+                        triggerMillis,
+                        pendingIntent
+                    )
+                }
+            } catch (e: SecurityException) {
+                Log.e(TAG, "Failed to schedule exact alarm, falling back to inexact alarm", e)
+                alarmManager.setAndAllowWhileIdle(
                     AlarmManager.RTC_WAKEUP,
                     triggerMillis,
                     pendingIntent
                 )
-            } catch (_: SecurityException) {
-                // SCHEDULE_EXACT_ALARM permission not granted
             }
         }
     }

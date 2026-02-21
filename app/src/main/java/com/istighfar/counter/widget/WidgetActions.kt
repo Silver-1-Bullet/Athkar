@@ -13,6 +13,18 @@ import com.istighfar.counter.data.CounterRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
+private suspend fun syncWidgetState(context: Context, glanceId: GlanceId) {
+    val snapshot = CounterRepository(context).getSnapshot()
+    updateAppWidgetState(context, glanceId) { prefs ->
+        prefs.toMutablePreferences().apply {
+            this[IstighfarWidget.todayCountKey] = snapshot.first
+            this[IstighfarWidget.lifetimeCountKey] = snapshot.second
+            this[IstighfarWidget.dhikrKey] = snapshot.third
+        }
+    }
+    IstighfarWidget().update(context, glanceId)
+}
+
 class IncrementAction : ActionCallback {
     override suspend fun onAction(
         context: Context,
@@ -27,18 +39,8 @@ class IncrementAction : ActionCallback {
             CounterRepository(context).incrementCount()
         }
 
-        // 3. تحديث حالة الـ Widget مباشرة
-        val snapshot = CounterRepository(context).getSnapshot()
-        updateAppWidgetState(context, glanceId) { prefs ->
-            prefs.toMutablePreferences().apply {
-                this[IstighfarWidget.todayCountKey] = snapshot.first
-                this[IstighfarWidget.lifetimeCountKey] = snapshot.second
-                this[IstighfarWidget.dhikrKey] = snapshot.third
-            }
-        }
-
-        // 4. تحديث واجهة الـ Widget
-        IstighfarWidget().update(context, glanceId)
+        // 3. تحديث حالة الـ Widget وواجهته مباشرة
+        syncWidgetState(context, glanceId)
     }
 
     private fun hapticFeedback(context: Context) {
@@ -75,16 +77,7 @@ class ResetTodayAction : ActionCallback {
             CounterRepository(context).resetTodayCount()
         }
 
-        // تحديث حالة الـ Widget مباشرة
-        val snapshot = CounterRepository(context).getSnapshot()
-        updateAppWidgetState(context, glanceId) { prefs ->
-            prefs.toMutablePreferences().apply {
-                this[IstighfarWidget.todayCountKey] = snapshot.first
-                this[IstighfarWidget.lifetimeCountKey] = snapshot.second
-                this[IstighfarWidget.dhikrKey] = snapshot.third
-            }
-        }
-
-        IstighfarWidget().update(context, glanceId)
+        // تحديث حالة الـ Widget وواجهته مباشرة
+        syncWidgetState(context, glanceId)
     }
 }

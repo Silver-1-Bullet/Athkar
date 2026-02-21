@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="teal_dark">#0D4D4D</color>
+    <color name="teal_primary">#1A6B6B</color>
+    <color name="teal_light">#2D9E9E</color>
+    <color name="gold_accent">#D4A843</color>
+    <color name="gold_light">#FAEED9</color>
+    <color name="cream_background">#F5F0E8</color>
+    <color name="sage_green">#8AAE92</color>
+    <color name="dark_surface">#0A1E1E</color>
+    <color name="dark_background">#061414</color>
+    <color name="dark_card">#0F2E2E</color>
+</resources>

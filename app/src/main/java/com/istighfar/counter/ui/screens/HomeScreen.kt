@@ -45,11 +45,13 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.glance.appwidget.updateAll
+import com.istighfar.counter.R
 import com.istighfar.counter.data.CounterRepository
 import com.istighfar.counter.widget.IstighfarWidget
 import kotlinx.coroutines.launch
@@ -84,14 +86,14 @@ fun HomeScreen() {
 
         // Title
         Text(
-            text = "أذكاري",
+            text = stringResource(R.string.app_name),
             style = MaterialTheme.typography.titleLarge,
             color = MaterialTheme.colorScheme.onPrimary,
             fontWeight = FontWeight.Bold,
             fontSize = 32.sp
         )
         Text(
-            text = "سبّح واستغفر",
+            text = stringResource(R.string.subtitle),
             style = MaterialTheme.typography.bodyLarge,
             color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.8f)
         )
@@ -117,8 +119,8 @@ fun HomeScreen() {
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceEvenly
         ) {
-            StatCard(label = "اليوم", value = todayCount.toString())
-            StatCard(label = "الإجمالي", value = lifetimeCount.toString())
+            StatCard(label = stringResource(R.string.today), value = todayCount.toString())
+            StatCard(label = stringResource(R.string.lifetime), value = lifetimeCount.toString())
         }
 
         Spacer(modifier = Modifier.height(24.dp))
@@ -255,7 +257,7 @@ private fun DhikrSelector(
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             Text(
-                text = "اختر الذكر",
+                text = stringResource(R.string.choose_dhikr),
                 style = MaterialTheme.typography.bodyLarge,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.onSurface
@@ -296,7 +298,7 @@ private fun SettingsCard(
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             Text(
-                text = "الإعدادات",
+                text = stringResource(R.string.settings),
                 style = MaterialTheme.typography.bodyLarge,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.onSurface
@@ -308,7 +310,7 @@ private fun SettingsCard(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = "إعادة التعيين التلقائي عند منتصف الليل",
+                    text = stringResource(R.string.auto_reset_midnight),
                     style = MaterialTheme.typography.bodyLarge,
                     color = MaterialTheme.colorScheme.onSurface,
                     modifier = Modifier.weight(1f)
@@ -329,7 +331,7 @@ private fun SettingsCard(
                 shape = RoundedCornerShape(12.dp)
             ) {
                 Text(
-                    text = "إعادة تعيين اليوم",
+                    text = stringResource(R.string.reset_today),
                     color = MaterialTheme.colorScheme.secondary
                 )
             }

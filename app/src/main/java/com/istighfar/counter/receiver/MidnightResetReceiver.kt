@@ -51,29 +51,29 @@ class MidnightResetReceiver : BroadcastReceiver() {
             val triggerMillis = LocalDate.now().plusDays(1)
                 .atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli()
 
-            try {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && !alarmManager.canScheduleExactAlarms()) {
-                    alarmManager.setAndAllowWhileIdle(
-                        AlarmManager.RTC_WAKEUP,
-                        triggerMillis,
-                        pendingIntent
-                    )
-                    Log.w(TAG, "Exact alarm permission not granted, using inexact alarm as fallback")
-                } else {
+            val canScheduleExact = Build.VERSION.SDK_INT < Build.VERSION_CODES.S ||
+                    alarmManager.canScheduleExactAlarms()
+
+            if (canScheduleExact) {
+                try {
                     alarmManager.setExactAndAllowWhileIdle(
                         AlarmManager.RTC_WAKEUP,
                         triggerMillis,
                         pendingIntent
                     )
+                    return
+                } catch (e: SecurityException) {
+                    Log.e(TAG, "Failed to schedule exact alarm, falling back to inexact alarm", e)
                 }
-            } catch (e: SecurityException) {
-                Log.e(TAG, "Failed to schedule exact alarm, falling back to inexact alarm", e)
-                alarmManager.setAndAllowWhileIdle(
-                    AlarmManager.RTC_WAKEUP,
-                    triggerMillis,
-                    pendingIntent
-                )
+            } else {
+                Log.w(TAG, "Exact alarm permission not granted, using inexact alarm as fallback")
             }
+
+            alarmManager.setAndAllowWhileIdle(
+                AlarmManager.RTC_WAKEUP,
+                triggerMillis,
+                pendingIntent
+            )
         }
     }
 }

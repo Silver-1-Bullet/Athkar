@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">أذكاري</string>
+    <string name="widget_description">عداد الأذكار اليومية</string>
+    <string name="increment">زيادة</string>
+    <string name="reset">إعادة تعيين</string>
+    <string name="today">اليوم</string>
+    <string name="lifetime">الإجمالي</string>
+    <string name="settings">الإعدادات</string>
+    <string name="auto_reset">إعادة التعيين التلقائي</string>
+</resources>

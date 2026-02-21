@@ -5,6 +5,7 @@ import android.app.PendingIntent
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import androidx.glance.appwidget.updateAll
 import com.istighfar.counter.data.CounterRepository
 import com.istighfar.counter.widget.IstighfarWidget
 import kotlinx.coroutines.CoroutineScope
